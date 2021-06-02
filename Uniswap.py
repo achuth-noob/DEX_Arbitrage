@@ -102,16 +102,16 @@ class UniswapObject(object):
 class UniswapV2Client(UniswapObject):
 
     ADDRESS = address.uniswap_factory_address
-    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assets/" + "IUniswapV2Factory.json")))["abi"]
+    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Factory.json")))["abi"]
 
     ROUTER_ADDRESS = address.uniswap_router_address
-    ROUTER_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assets/" + "IUniswapV2Router02.json")))["abi"]
+    ROUTER_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Router02.json")))["abi"]
 
     MAX_APPROVAL_HEX = "0x" + "f" * 64
     MAX_APPROVAL_INT = int(MAX_APPROVAL_HEX, 16)
-    ERC20_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assets/" + "IUniswapV2ERC20.json")))["abi"]
+    ERC20_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2ERC20.json")))["abi"]
 
-    PAIR_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assets/" + "IUniswapV2Pair.json")))["abi"]
+    PAIR_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Pair.json")))["abi"]
 
     def __init__(self, address, private_key, provider=None):
         super().__init__(address, private_key, provider)
