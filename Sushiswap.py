@@ -1,12 +1,13 @@
 import os
 import json
+from address import *
+import pprint
+import keys
 from web3 import Web3
 from web3.exceptions import BadFunctionCallOutput
-import address
 import re
 
-
-class UniswapV2Utils(object):
+class SushiswapUtils(object):
 
     ZERO_ADDRESS = Web3.toHex(0x0)
 
@@ -14,13 +15,13 @@ class UniswapV2Utils(object):
     def sort_tokens(token_a, token_b):
         assert token_a != token_b
         (token_0, token_1) = (token_a, token_b) if int(token_a, 16) < int(token_b, 16) else (token_b, token_a)
-        assert token_0 != UniswapV2Utils.ZERO_ADDRESS
+        assert token_0 != SushiswapUtils.ZERO_ADDRESS
         return token_0, token_1
 
     @staticmethod
     def pair_for(factory, token_a, token_b):
         prefix = Web3.toHex(hexstr="ff")
-        encoded_tokens = Web3.solidityKeccak(["address", "address"], UniswapV2Utils.sort_tokens(token_a, token_b))
+        encoded_tokens = Web3.solidityKeccak(["address", "address"], SushiswapUtils.sort_tokens(token_a, token_b))
         suffix = Web3.toHex(hexstr="96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f")
         raw = Web3.solidityKeccak(["bytes", "address", "bytes", "bytes"], [prefix, factory, encoded_tokens, suffix])
         return Web3.toChecksumAddress(Web3.toHex(raw)[-40:])
@@ -65,7 +66,7 @@ class UniswapV2Utils(object):
         return int(numerator/denominator + 1)
 
 
-class UniswapObject(object):
+class SushiswapObject(object):
 
     def __init__(self, address, private_key, provider=None):
         self.address = Web3.toChecksumAddress(address)
@@ -73,14 +74,14 @@ class UniswapObject(object):
         self.provider = provider
 
         if re.match(r'^https*:', self.provider):
-            prvider = Web3.HTTPProvider(self.provider, request_kwargs={"timeout": 60})
+            provider = Web3.HTTPProvider(self.provider, request_kwargs={"timeout": 60})
         elif re.match(r'^ws*:', self.provider):
-            prvider = Web3.WebsocketProvider(self.provider)
+            provider = Web3.WebsocketProvider(self.provider)
         elif re.match(r'^/', self.provider):
-            prvider = Web3.IPCProvider(self.provider)
+            provider = Web3.IPCProvider(self.provider)
         else:
             raise RuntimeError("Unknown provider type " + self.provider)
-        self.conn = Web3(prvider)
+        self.conn = Web3(provider)
         if not self.conn.isConnected():
             raise RuntimeError("Unable to connect to provider at " + self.provider)
         self.gasPrice = self.conn.toWei(15, "gwei"),
@@ -100,44 +101,30 @@ class UniswapObject(object):
         return self.conn.eth.sendRawTransaction(signed_tx.rawTransaction)
 
 
-class ERC20(UniswapObject):
+class SushiswapClient(SushiswapObject):
 
-    def __init__(self,token_address, address, private_key, provider=None):
-        super().__init__(address, private_key, provider)
-        self.token_address = token_address
-        self.erc20_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(self.token_address), abi=UniswapV2Client.ERC20_ABI)
+    ADDRESS = sushiswap_factory_address
+    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "SushiswapFactory.json")))
 
-    # def get_decimal(self):
-    #     return self.decimal
-
-
-class UniswapV2Client(UniswapObject):
-
-    ADDRESS = address.uniswap_factory_address
-    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Factory.json")))["abi"]
-
-    ROUTER_ADDRESS = address.uniswap_router_address
-    ROUTER_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Router02.json")))["abi"]
+    ROUTER_ADDRESS = sushiswap_router_address
+    ROUTER_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Router02.json")))
 
     MAX_APPROVAL_HEX = "0x" + "f" * 64
     MAX_APPROVAL_INT = int(MAX_APPROVAL_HEX, 16)
-    ERC20_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2ERC20.json")))["abi"]
+    ERC20_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2ERC20.json")))['abi']
 
-    PAIR_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Pair.json")))["abi"]
+    PAIR_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Pair.json")))['abi']
 
     def __init__(self, address, private_key, provider=None):
         super().__init__(address, private_key, provider)
         self.contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(UniswapV2Client.ADDRESS), abi=UniswapV2Client.ABI)
-        self.router = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(UniswapV2Client.ROUTER_ADDRESS), abi=UniswapV2Client.ROUTER_ABI)
+            address=Web3.toChecksumAddress(SushiswapClient.ADDRESS), abi=SushiswapClient.ABI)
 
     # Utilities
     # -----------------------------------------------------------
     def _is_approved(self, token, amount=MAX_APPROVAL_INT):
         erc20_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(token), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(token), abi=SushiswapClient.PAIR_ABI)
         print(erc20_contract, token)
         approved_amount = erc20_contract.functions.allowance(self.address, self.router.address).call()
         return approved_amount >= amount
@@ -151,7 +138,7 @@ class UniswapV2Client(UniswapObject):
 
         print(f"Approving {max_approval} of {token}")
         erc20_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(token), abi=UniswapV2Client.ERC20_ABI)
+            address=Web3.toChecksumAddress(token), abi=SushiswapClient.ERC20_ABI)
 
         func = erc20_contract.functions.approve(self.router.address, max_approval)
         params = self._create_transaction_params()
@@ -192,7 +179,7 @@ class UniswapV2Client(UniswapObject):
     def get_factory(self, query_chain=False):
         if query_chain:
             return self.router.functions.factory().call()
-        return UniswapV2Client.ADDRESS
+        return SushiswapClient.ADDRESS
 
     def get_weth_address(self):
         return self.router.functions.WETH().call()
@@ -203,8 +190,7 @@ class UniswapV2Client(UniswapObject):
     def add_liquidity(self, token_a, token_b, amount_a, amount_b, min_a, min_b, to_address, deadline):
         self.approve(token_a, amount_a)
         self.approve(token_b, amount_b)
-        func = self.router.functions.addLiquidity(
-            token_a, token_b, amount_a, amount_b, min_a, min_b, to_address, deadline)
+        func = self.router.functions.addLiquidity(token_a, token_b, amount_a, amount_b, min_a, min_b, to_address, deadline)
         params = self._create_transaction_params(gas=3000000)  #FIXME
         return self._send_transaction(func, params)
 
@@ -231,20 +217,20 @@ class UniswapV2Client(UniswapObject):
     # -----------------------------------------------------------
     def get_token_0(self, pair):
         pair_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(pair), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(pair), abi=SushiswapClient.PAIR_ABI)
         return pair_contract.functions.token0().call()
 
     def get_token_1(self, pair):
         pair_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(pair), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(pair), abi=SushiswapClient.PAIR_ABI)
         return pair_contract.functions.token1().call()
 
     def get_reserves(self, token_a, token_b):
-        (token0, token1) = UniswapV2Utils.sort_tokens(token_a, token_b)
+        (token0, token1) = SushiswapUtils.sort_tokens(token_a, token_b)
         pair_contract = self.conn.eth.contract(
             address=Web3.toChecksumAddress(
-                UniswapV2Utils.pair_for(self.get_factory(), token_a, token_b)),
-                abi=UniswapV2Client.PAIR_ABI
+                SushiswapUtils.pair_for(self.get_factory(), token_a, token_b)),
+                abi=SushiswapClient.PAIR_ABI
             )
         reserve = pair_contract.functions.getReserves().call()
         return reserve if token0 == token_a else [reserve[1], reserve[0], reserve[2]]
@@ -255,7 +241,7 @@ class UniswapV2Client(UniswapObject):
         to token_0.
         """
         pair_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(pair), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(pair), abi=SushiswapClient.PAIR_ABI)
         return pair_contract.functions.price0CumulativeLast().call()
 
     def get_price_1_cumulative_last(self, pair):
@@ -264,7 +250,7 @@ class UniswapV2Client(UniswapObject):
         to token_1.
         """
         pair_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(pair), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(pair), abi=SushiswapClient.PAIR_ABI)
         return pair_contract.functions.price1CumulativeLast().call()
 
     def get_k_last(self, pair):
@@ -273,7 +259,7 @@ class UniswapV2Client(UniswapObject):
         liquidity event.
         """
         pair_contract = self.conn.eth.contract(
-            address=Web3.toChecksumAddress(pair), abi=UniswapV2Client.PAIR_ABI)
+            address=Web3.toChecksumAddress(pair), abi=SushiswapClient.PAIR_ABI)
         return pair_contract.functions.kLast().call()
 
     def get_amounts_out(self, amount_in, path):
@@ -282,7 +268,7 @@ class UniswapV2Client(UniswapObject):
         current_amount = amount_in
         for p0, p1 in zip(path, path[1:]):
             r = self.get_reserves(p0, p1)
-            current_amount = UniswapV2Utils.get_amount_out(
+            current_amount = SushiswapClient.get_amount_out(
                 current_amount, r[0], r[1]
             )
             amounts.append(current_amount)
@@ -294,7 +280,7 @@ class UniswapV2Client(UniswapObject):
         current_amount = amount_out
         for p0, p1 in reversed(list(zip(path, path[1:]))):
             r = self.get_reserves(p0, p1)
-            current_amount = UniswapV2Utils.get_amount_in(
+            current_amount = SushiswapClient.get_amount_in(
                 current_amount, r[0], r[1]
             )
             amounts.insert(0, current_amount)
