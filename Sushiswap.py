@@ -229,9 +229,11 @@ class SushiswapClient(SushiswapObject):
         (token0, token1) = SushiswapUtils.sort_tokens(token_a, token_b)
         pair_contract = self.conn.eth.contract(
             address=Web3.toChecksumAddress(
-                SushiswapUtils.pair_for(self.get_factory(), token_a, token_b)),
+                self.get_pair(token_a, token_b)),
                 abi=SushiswapClient.PAIR_ABI
             )
+        print(self.get_pair(token_a, token_b))
+        print('Hi',SushiswapUtils.pair_for(self.get_factory(), token_a, token_b))
         reserve = pair_contract.functions.getReserves().call()
         return reserve if token0 == token_a else [reserve[1], reserve[0], reserve[2]]
 

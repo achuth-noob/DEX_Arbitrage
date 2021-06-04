@@ -1,5 +1,6 @@
 from Uniswap import UniswapV2Client,ERC20
 from Sushiswap import SushiswapClient
+from tokens import *
 from address import *
 from web3 import Web3
 from keys import *
@@ -7,6 +8,7 @@ import pprint
 import json
 import os
 
+sushiswap_obj = SushiswapClient(owner_address,owner_private_key,provider)
 # client = SushiswapClient(owner_address,owner_private_key,provider)
 #
 tokens = {
@@ -44,5 +46,8 @@ contract = connection.eth.contract(
             address=Web3.toChecksumAddress(sushiswap_factory_address), abi=sushifactory_abi)
 pair_contract = connection.eth.contract(
             address=Web3.toChecksumAddress(contract.functions.allPairs(1).call()), abi=PAIR_ABI)
-# print(contract.functions.allPairs(1).call())
-print(pair_contract.functions.token1().call())
+print(contract.functions.getPair(Web3.toChecksumAddress(tokens['USDC']),Web3.toChecksumAddress(tokens['DAI'])).call())
+print(pair_contract.functions.getReserves().call())
+print()
+print(sushiswap_obj.get_reserves(tokens['USDC'], tokens['DAI']))
+print(contract.functions.getPair(tokens['USDC'], tokens['DAI']).call())
