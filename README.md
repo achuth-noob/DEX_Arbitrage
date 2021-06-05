@@ -11,4 +11,4 @@ TODO -
 
 To be discussed - 
 
-1. Do we need smart contracts for bundling of txns?
+1. Security Aspects.
