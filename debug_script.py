@@ -51,7 +51,6 @@ pair_contract = connection.eth.contract(
 # print(pair_contract.functions.getReserves().call())
 # print()
 # print(sushiswap_obj.get_reserves(tokens['USDC'], tokens['DAI']))
-print(contract.functions.getPair(tokens['USDC'], tokens['DAI']).call())
 
 # token_reserves = []
 # token_comb = list(itertools.combinations(tokens,2))
@@ -72,19 +71,9 @@ print(contract.functions.getPair(tokens['USDC'], tokens['DAI']).call())
 #             continue
 # print(token_reserves)
 
-
-# connection = Web3(Web3.HTTPProvider(provider, request_kwargs={"timeout": 60}))
-# # print(connection.isConnected())
-# sushifactory_abi = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}"
-#                                                   f"/assests/" + "SushiswapFactory.json")))
-# PAIR_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}"
-#                                           f"/assests/" + "IUniswapV2Pair.json")))['abi']
-# contract = connection.eth.contract(
-#             address=Web3.toChecksumAddress(sushiswap_factory_address), abi=sushifactory_abi)
-# pair_contract = connection.eth.contract(
-#             address=Web3.toChecksumAddress(contract.functions.allPairs(1).call()), abi=PAIR_ABI)
 print(contract.functions.getPair(Web3.toChecksumAddress(tokens['USDC']['address']),Web3.toChecksumAddress(tokens['DAI']['address'])).call())
 print(pair_contract.functions.getReserves().call())
 print()
 print(sushiswap_obj.get_reserves(tokens['USDC']['address'], tokens['DAI']['address']))
-print(contract.functions.getPair(tokens['USDC']['address'], tokens['DAI']['address'])).call()
+print(contract.functions.getPair(tokens['USDC']['address'], tokens['DAI']['address']).call())
+print(contract.functions.getPair(tokens['USDC']['address'], tokens['DAI']['address']).call())
