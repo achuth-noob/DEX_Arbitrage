@@ -3,12 +3,11 @@
 TODO - 
 
 1. Optimise Arbitrage_main.py (not coded brute version yet)
-2. Generalise the Uniswap.py to be used for interfacing other exchanges.
-3. Integrate Flash loans
-4. Bundle txns using flashbot.
-5. Database integrations
-6. Socket streaming
+2. Integrate Flash loans
+3. Bundle txns using flashbot.
+4. Database integrations
+5. Socket streaming
 
 To be discussed - 
 
-1. Do we need smart contracts for bundling of txns?
+1. Security Aspects.
