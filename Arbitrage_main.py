@@ -12,8 +12,6 @@ import os
 
 uniswap_obj = Uniswap.UniswapV2Client(owner_address,owner_private_key,provider)
 sushiswap_obj = Sushiswap.SushiswapClient(owner_address,owner_private_key,provider)
-
-<<<<<<< HEAD
 # class Simple_arbitrage(object):
 #
 #     def __init__(self,_token1_addr,_token2_addr):
@@ -75,7 +73,6 @@ Direct_Arbitrage([uniswap_obj,sushiswap_obj])
 
 # simArbObj = Direct_Arbitrage(tokens['UNI'],tokens['DAI'])
 # simArbObj.search_arbitrage()
-=======
 class Simple_arbitrage(object):
 
     def __init__(self,_token1_addr,_token2_addr):
@@ -100,4 +97,3 @@ class Simple_arbitrage(object):
 
 simArbObj = Simple_arbitrage(tokens['USDT']['address'],tokens['USDC']['address'])
 simArbObj.search_arbitrage()
->>>>>>> refs/remotes/origin/main
