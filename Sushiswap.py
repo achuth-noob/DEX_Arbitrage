@@ -72,6 +72,7 @@ class SushiswapObject(object):
         self.address = Web3.toChecksumAddress(address)
         self.private_key = private_key
         self.provider = provider
+        self.name = 'sushiswap'
 
         if re.match(r'^https*:', self.provider):
             provider = Web3.HTTPProvider(self.provider, request_kwargs={"timeout": 60})
@@ -232,8 +233,8 @@ class SushiswapClient(SushiswapObject):
                 self.get_pair(token_a, token_b)),
                 abi=SushiswapClient.PAIR_ABI
             )
-        print(self.get_pair(token_a, token_b))
-        print('Hi',SushiswapUtils.pair_for(self.get_factory(), token_a, token_b))
+        # print(self.get_pair(token_a, token_b))
+        # print('Hi',SushiswapUtils.pair_for(self.get_factory(), token_a, token_b))
         reserve = pair_contract.functions.getReserves().call()
         return reserve if token0 == token_a else [reserve[1], reserve[0], reserve[2]]
 
