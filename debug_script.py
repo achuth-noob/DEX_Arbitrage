@@ -50,4 +50,4 @@ print(contract.functions.getPair(Web3.toChecksumAddress(tokens['USDC']),Web3.toC
 print(pair_contract.functions.getReserves().call())
 print()
 print(sushiswap_obj.get_reserves(tokens['USDC'], tokens['DAI']))
-print(contract.functions.getPair(tokens['USDC'], tokens['DAI']).call())
+print(contract.functions.getPair(tokens['USDC'], tokens['DAI'])).call()

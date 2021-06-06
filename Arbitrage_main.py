@@ -30,5 +30,5 @@ class Simple_arbitrage(object):
         else:
             pass
 
-simArbObj = Simple_arbitrage(tokens['USDT'],tokens['USDC'])
+simArbObj = Simple_arbitrage(tokens['USDT']['address'],tokens['USDC']['address'])
 simArbObj.search_arbitrage()
