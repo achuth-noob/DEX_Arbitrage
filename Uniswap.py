@@ -46,7 +46,7 @@ class UniswapV2Utils(object):
         amount_in_with_fee = amount_in*997
         numerator = amount_in_with_fee*reserve_out
         denominator = reserve_in*1000 + amount_in_with_fee
-        return int(numerator/denominator)
+        return float(numerator/denominator)
 
     @staticmethod
     def get_amount_in(amount_out, reserve_in, reserve_out):
@@ -62,7 +62,7 @@ class UniswapV2Utils(object):
         assert reserve_in > 0 and reserve_out > 0
         numerator = reserve_in*amount_out*1000
         denominator = (reserve_out - amount_out)*997
-        return int(numerator/denominator + 1)
+        return float(numerator/denominator + 1)
 
 
 class UniswapObject(object):
@@ -71,6 +71,7 @@ class UniswapObject(object):
         self.address = Web3.toChecksumAddress(address)
         self.private_key = private_key
         self.provider = provider
+        self.name = 'uniswap'
 
         if re.match(r'^https*:', self.provider):
             prvider = Web3.HTTPProvider(self.provider, request_kwargs={"timeout": 60})

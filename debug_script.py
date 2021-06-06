@@ -1,6 +1,6 @@
 from Uniswap import UniswapV2Client,ERC20
 from Sushiswap import SushiswapClient
-from tokens import *
+from test_tokens import *
 from address import *
 from web3 import Web3
 from keys import *
@@ -52,6 +52,19 @@ pair_contract = connection.eth.contract(
 # print()
 # print(sushiswap_obj.get_reserves(tokens['USDC'], tokens['DAI']))
 
+def query_token(_provider,_token_addr):
+    connection = Web3(Web3.HTTPProvider(_provider, request_kwargs={"timeout": 60}))
+    # print(connection.isConnected())
+    token_abi = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}"
+                                                      f"/assests/" + "IUniswapV2ERC20.json")))['abi']
+    contract = connection.eth.contract(
+        address=Web3.toChecksumAddress(_token_addr), abi=token_abi)
+    try:
+        q = contract.functions.decimals().call()
+        return True
+    except:
+        return False
+
 # token_reserves = []
 # token_comb = list(itertools.combinations(tokens,2))
 # pprint.pprint(token_comb)
@@ -71,9 +84,3 @@ pair_contract = connection.eth.contract(
 #             continue
 # print(token_reserves)
 
-print(contract.functions.getPair(Web3.toChecksumAddress(tokens['USDC']['address']),Web3.toChecksumAddress(tokens['DAI']['address'])).call())
-print(pair_contract.functions.getReserves().call())
-print()
-print(sushiswap_obj.get_reserves(tokens['USDC']['address'], tokens['DAI']['address']))
-print(contract.functions.getPair(tokens['USDC']['address'], tokens['DAI']['address']).call())
-print(contract.functions.getPair(tokens['USDC']['address'], tokens['DAI']['address']).call())
