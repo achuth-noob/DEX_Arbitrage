@@ -241,14 +241,19 @@ class UniswapV2Client(UniswapObject):
         return pair_contract.functions.token1().call()
 
     def get_reserves(self, token_a, token_b):
-        (token0, token1) = UniswapV2Utils.sort_tokens(token_a, token_b)
+        (token0, token1) = UniswapV2Utils.sort_tokens(token_a['address'], token_b['address'])
         pair_contract = self.conn.eth.contract(
             address=Web3.toChecksumAddress(
-                UniswapV2Utils.pair_for(self.get_factory(), token_a, token_b)),
-                abi=UniswapV2Client.PAIR_ABI
-            )
+                self.get_pair(token_a['address'], token_b['address'])),
+            abi=UniswapV2Client.PAIR_ABI
+        )
         reserve = pair_contract.functions.getReserves().call()
-        return reserve if token0 == token_a else [reserve[1], reserve[0], reserve[2]]
+        return reserve if token0 == token_a['address'] else [reserve[1], reserve[0], reserve[2]]
+
+    def get_exact_reserves(self, token_a, token_b):
+        reserves = self.get_reserves(token_a,token_b)
+        reserves = [reserves[0]/10**token_a['decimals'],reserves[1]/10**token_b['decimals'],reserves[2]]
+        return reserves
 
     def get_price_0_cumulative_last(self, pair):
         """

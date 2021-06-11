@@ -20,7 +20,7 @@ class Direct_Arbitrage(object):
     2. Converts back token2 to token1 in exchange2.
     """
     def __init__(self,_exchange_obj_list):
-        print("---------------------Process Initialized------------------")
+        print("---------------------Process Initialized---------------------")
         self.exchanges_list = _exchange_obj_list
         self.token_reserves = {}
         token_comb = list(itertools.combinations(tokens, 2))
@@ -30,7 +30,7 @@ class Direct_Arbitrage(object):
             print(i)
             for j in token_comb:
                 try:
-                    [reserve1,reserve2,t] = i.get_reserves(tokens[j[0]]['address'],tokens[j[1]]['address'])
+                    [reserve1,reserve2,t] = i.get_exact_reserves(tokens[j[0]],tokens[j[1]])
                     tmp[j[0],j[1]]={j[0]: reserve1,j[1]: reserve2}
                 except:
                     continue
@@ -40,24 +40,21 @@ class Direct_Arbitrage(object):
     @staticmethod
     def arbitrage_returns(_reserve1_1,_reserve1_2,_reserve2_1,_reserve2_2):
         a_in_1 = 1
-        a_in_2 = 1
         a_out_1 = Sushiswap.SushiswapUtils.get_amount_out(a_in_1,_reserve1_1,_reserve1_2)
-        a_out_2 = Uniswap.UniswapV2Utils.get_amount_out(a_in_2,_reserve2_1,_reserve2_2)
-        return (a_out_1*a_out_2-1)*100
+        a_out_2 = Uniswap.UniswapV2Utils.get_amount_out(a_out_1,_reserve2_2,_reserve2_1)
+        return (a_out_2-1)*100
 
     def analysis(self):
+        print("..............Main section running..............")
         for i in self.token_reserves['sushiswap']:
             for j in self.token_reserves['uniswap']:
                 if i==j:
-                    print("Main section running..............")
                     reserve1_1=self.token_reserves['sushiswap'][i][i[0]]
                     reserve1_2=self.token_reserves['sushiswap'][i][i[1]]
                     reserve2_1=self.token_reserves['uniswap'][j][j[0]]
                     reserve2_2=self.token_reserves['uniswap'][j][j[1]]
-
                     arb_ret = self.arbitrage_returns(reserve1_1,reserve1_2,reserve2_1,reserve2_2)
-                    print("Arb - ",i,arb_ret)
-
+                    print("Arb - ",i,arb_ret,'%')
 
 Direct_Arbitrage([uniswap_obj,sushiswap_obj]).analysis()
 

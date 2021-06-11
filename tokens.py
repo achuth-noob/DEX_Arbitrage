@@ -1,4 +1,4 @@
-{
+tokens = {
  '$TRDL': {'address': '0x297D33e17e61C2Ddd812389C2105193f8348188a',
            'decimals': 18},
  '0XBTC': {'address': '0xB6eD7644C69416d67B522e20bC294A9a9B405B31',

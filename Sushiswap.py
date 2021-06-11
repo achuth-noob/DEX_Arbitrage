@@ -105,7 +105,8 @@ class SushiswapObject(object):
 class SushiswapClient(SushiswapObject):
 
     ADDRESS = sushiswap_factory_address
-    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "SushiswapFactory.json")))
+    ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}"
+                                         f"/assests/" + "SushiswapFactory.json")))
 
     ROUTER_ADDRESS = sushiswap_router_address
     ROUTER_ABI = json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/assests/" + "IUniswapV2Router02.json")))
@@ -185,7 +186,6 @@ class SushiswapClient(SushiswapObject):
     def get_weth_address(self):
         return self.router.functions.WETH().call()
 
-
     # Router State-Changing Functions
     # -----------------------------------------------------------
     def add_liquidity(self, token_a, token_b, amount_a, amount_b, min_a, min_b, to_address, deadline):
@@ -227,16 +227,19 @@ class SushiswapClient(SushiswapObject):
         return pair_contract.functions.token1().call()
 
     def get_reserves(self, token_a, token_b):
-        (token0, token1) = SushiswapUtils.sort_tokens(token_a, token_b)
+        (token0, token1) = SushiswapUtils.sort_tokens(token_a['address'], token_b['address'])
         pair_contract = self.conn.eth.contract(
             address=Web3.toChecksumAddress(
-                self.get_pair(token_a, token_b)),
-                abi=SushiswapClient.PAIR_ABI
-            )
-        # print(self.get_pair(token_a, token_b))
-        # print('Hi',SushiswapUtils.pair_for(self.get_factory(), token_a, token_b))
+                self.get_pair(token_a['address'], token_b['address'])),
+            abi=SushiswapClient.PAIR_ABI
+        )
         reserve = pair_contract.functions.getReserves().call()
-        return reserve if token0 == token_a else [reserve[1], reserve[0], reserve[2]]
+        return reserve if token0 == token_a['address'] else [reserve[1], reserve[0], reserve[2]]
+
+    def get_exact_reserves(self, token_a, token_b):
+        reserves = self.get_reserves(token_a,token_b)
+        reserves = [reserves[0]/10**token_a['decimals'],reserves[1]/10**token_b['decimals'],reserves[2]]
+        return reserves
 
     def get_price_0_cumulative_last(self, pair):
         """
