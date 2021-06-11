@@ -10,9 +10,6 @@ import pprint
 import json
 import os
 
-uniswap_obj = Uniswap.UniswapV2Client(owner_address,owner_private_key,provider)
-sushiswap_obj = Sushiswap.SushiswapClient(owner_address,owner_private_key,provider)
-
 class Direct_Arbitrage(object):
     """
     Direct Arbitrage -
@@ -20,22 +17,22 @@ class Direct_Arbitrage(object):
     2. Converts back token2 to token1 in exchange2.
     """
     def __init__(self,_exchange_obj_list):
-        print("---------------------Process Initialized---------------------")
         self.exchanges_list = _exchange_obj_list
         self.token_reserves = {}
-        token_comb = list(itertools.combinations(tokens, 2))
-        pprint.pprint(token_comb)
+        # DB call
+        # token_comb = list(itertools.combinations(tokens, 2))
+        # pprint.pprint(token_comb)
         for i in self.exchanges_list:
             tmp = {}
-            print(i)
             for j in token_comb:
                 try:
+                    # DB call
                     [reserve1,reserve2,t] = i.get_exact_reserves(tokens[j[0]],tokens[j[1]])
                     tmp[j[0],j[1]]={j[0]: reserve1,j[1]: reserve2}
                 except:
                     continue
             self.token_reserves[i.name]=tmp
-        pprint.pprint(self.token_reserves)
+        # pprint.pprint(self.token_reserves)
 
     @staticmethod
     def arbitrage_returns(_reserve1_1,_reserve1_2,_reserve2_1,_reserve2_2):
@@ -45,7 +42,6 @@ class Direct_Arbitrage(object):
         return (a_out_2-1)*100
 
     def analysis(self):
-        print("..............Main section running..............")
         for i in self.token_reserves['sushiswap']:
             for j in self.token_reserves['uniswap']:
                 if i==j:
@@ -56,6 +52,13 @@ class Direct_Arbitrage(object):
                     arb_ret = self.arbitrage_returns(reserve1_1,reserve1_2,reserve2_1,reserve2_2)
                     print("Arb - ",i,arb_ret,'%')
 
-Direct_Arbitrage([uniswap_obj,sushiswap_obj]).analysis()
+print("---------------------Process Initialized---------------------")
+uniswap_obj = Uniswap.UniswapV2Client(owner_address,owner_private_key,provider)
+sushiswap_obj = Sushiswap.SushiswapClient(owner_address,owner_private_key,provider)
+i = 1
+while True:
+    print(f'--------------Iteration {i} stared--------------')
+    Direct_Arbitrage([uniswap_obj,sushiswap_obj]).analysis()
+    i+=1
 
 

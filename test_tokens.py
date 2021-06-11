@@ -24,3 +24,19 @@ tokens = {
         "decimals": 18
     },
 }
+
+token_comb = [('USDC', 'DAI'),
+ ('USDC', 'UNI'),
+ ('USDC', 'WETH'),
+ ('USDC', 'WBTC'),
+ ('USDC', 'YFI'),
+ ('DAI', 'UNI'),
+ ('DAI', 'WETH'),
+ ('DAI', 'WBTC'),
+ ('DAI', 'YFI'),
+ ('UNI', 'WETH'),
+ ('UNI', 'WBTC'),
+ ('UNI', 'YFI'),
+ ('WETH', 'WBTC'),
+ ('WETH', 'YFI'),
+ ('WBTC', 'YFI')]
