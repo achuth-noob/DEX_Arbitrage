@@ -63,7 +63,7 @@ precompute_sushiswap = get_weth_pool_addresses(
 precompute_uniswap = get_weth_pool_addresses(
     get_pool_addresses(address.uniswap_factory_address))
 precompute_cro = get_weth_pool_addresses(
-    get_pool_addresses(address.cro_factory_address))
+    get_pool_addresses(address.croswap_factory_address))
 precompute_zeus = get_weth_pool_addresses(
     get_pool_addresses(address.zeus_factory_address))
 precompute_lua = get_weth_pool_addresses(
