@@ -23,7 +23,7 @@ class Uniswap_nPoolArbitrage_Utils(object):
         self.f = self.df['f'][0]
         self.rows = len(self.df)
         self.df['b_n'] = self.calculate_b_n()
-        self.df['track_b_n'] = np.where(self.df['b_n'] > 0, 1, "NaN")
+        self.df['track_b_n'] = np.where(self.df['b_n'] > 0, 1, np.nan)
         self.df.dropna(subset = ["track_b_n"], inplace=True)
         if self.df.empty():
             return
@@ -64,12 +64,13 @@ class Uniswap_nPoolArbitrage(object):
         self.token_reserves = {}
         self.main_df = pd.DataFrame({"tokens_comb":np.array(list(itertools.permutations(tokens, 2)),
                                                             dtype=np.dtype('U20,U20'))})
-        # print(self.main_df)
+        print(self.main_df)
+        comb_token = self.main_df['tokens_comb']
         for i in self.exchanges_list:
             tmp1=[]
             tmp2=[]
             k=0
-            for j in token_comb:
+            for j in comb_token:
                 try:
                     # DB call
                     [reserve1,reserve2,t] = i.get_exact_reserves(tokens[j[0]],tokens[j[1]])
@@ -86,7 +87,7 @@ class Uniswap_nPoolArbitrage(object):
             self.main_df[f"{i.name}_t0"]=tmp1
             self.main_df[f"{i.name}_t1"]=tmp2
         self.main_df.dropna(inplace=True)
-        print(self.main_df)
+        self.main_df.to_csv('./data/test_reserves.csv')
 
 class Direct_Arbitrage(object):
     """
