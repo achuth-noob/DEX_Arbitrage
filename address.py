@@ -3,3 +3,5 @@ uniswap_router_address = '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D'
 
 sushiswap_factory_address = '0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac'
 sushiswap_router_address = '0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F'
+
+uniswap_query_address = '0x5EF1009b9FCD4fec3094a5564047e190D72Bd511'
