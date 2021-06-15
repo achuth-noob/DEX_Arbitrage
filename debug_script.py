@@ -94,7 +94,7 @@ sushiswap_obj = SushiswapClient(owner_address,owner_private_key,provider)
 # pprint.pprint(uniswap_obj.get_exact_reserves(tokens['DAI'], tokens['USDC']))
 # pprint.pprint(uniswap_obj.get_exact_reserves(tokens['USDC'], tokens['DAI']))
 
-# pairs=json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/data/UniswapV2Pairs.json" )))
+# pairs=json.load(open(os.path.abspath(f"{os.path.dirname(os.path.abspath(__file__))}/precompute_data/UniswapV2Pairs.json" )))
 # pprint.pprint(pairs)
 # for i in pairs:
 #     for j in pairs[i]:
